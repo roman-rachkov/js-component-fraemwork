@@ -23,42 +23,21 @@ export default (function () {
     }
 
     function reactive(obj) {
-        obj = {
-            ___value: obj
+        obj = new Object({
+            ___value: obj,
+        })
+
+        obj.toString = function (){
+            return `${this.___value}`
         }
+
         const container = new SubscribersContainer();
-
-        // Object.defineProperty(obj, '___value', {
-        //     get() {
-        //         container.subscribe(target);
-        //         return internalValue;
-        //     },
-        //     set(v) {
-        //         internalValue = v;
-        //         container.notify();
-        //     }
-        // })
-
-        // Object.keys(obj).forEach(key => {
-        //     let internalValue = obj[key];
-        //
-        //     const container = new SubscribersContainer();
-        //
-        //     Object.defineProperty(obj, key, {
-        //         get() {
-        //             container.subscribe(target);
-        //             return internalValue;
-        //         },
-        //         set(v) {
-        //             internalValue = v;
-        //             container.notify();
-        //         }
-        //     });
-        // })
 
         return new Proxy(obj, {
             get(t, name) {
-                // console.log(container)
+                if (name in t) {
+                    return t[name];
+                }
                 if (name === 'value') {
                     container.subscribe(target);
                     return t.___value;
@@ -66,10 +45,9 @@ export default (function () {
                 return undefined;
             },
             set(t, name, newValue, receiver) {
-                // console.log(container)
                 if (name === 'value') {
-                    container.notify();
                     t.___value = newValue;
+                    container.notify();
                     return true;
                 }
                 throw new Error('For modify use only property value!!!')
@@ -85,9 +63,9 @@ export default (function () {
                 watch,
                 reactive
             }, {
-                get: (target, name) => {
-                    if (name in target) {
-                        return target[name];
+                get: (t, name) => {
+                    if (name in t) {
+                        return t[name];
                     }
                     if (name in modules) {
                         return modules[name];
