@@ -4,8 +4,9 @@ import core from '../js/core'
 
 export default () => {
 
+console.log(header);
 
     return (`
-        ${header()}
+        ${header}
     `)
 }

@@ -1,4 +1,5 @@
 import SubscribersContainer from "./container.js";
+import Component from "./component.js";
 
 export default (function () {
 
@@ -13,7 +14,22 @@ export default (function () {
     }
 
     function init({root, app}) {
-        document.querySelector(root).insertAdjacentHTML('beforeend', app);
+        const application = reactive(app);
+        watch(() => {
+            document.querySelector(root).innerHTML = application;
+        })
+    }
+
+    function makeComponent(component){
+
+        const id = crypto.randomUUID();
+        const cpt = component();
+
+        return new Component({
+            ...cpt,
+            selector: cpt.selector ?? `[data-component=id]`
+        })
+
     }
 
     function watch(callback) {
@@ -22,18 +38,18 @@ export default (function () {
         target = null;
     }
 
-    function reactive(obj) {
-        obj = new Object({
-            ___value: obj,
+    function reactive(initialValue) {
+        initialValue = new Object({
+            ___value: initialValue,
         })
 
-        obj.toString = function (){
+        initialValue.toString = function (){
             return `${this.___value}`
         }
 
         const container = new SubscribersContainer();
 
-        return new Proxy(obj, {
+        return new Proxy(initialValue, {
             get(t, name) {
                 if (name in t) {
                     return t[name];
@@ -61,7 +77,8 @@ export default (function () {
                 init,
                 useModule,
                 watch,
-                reactive
+                reactive,
+                makeComponent
             }, {
                 get: (t, name) => {
                     if (name in t) {
