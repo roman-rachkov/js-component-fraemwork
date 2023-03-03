@@ -1,0 +1,21 @@
+.header{
+    width: 100vw;
+    background-color: #eeeeee;
+    padding: 20px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.header .container{
+    display: flex;
+    justify-content: space-between;
+}
+
+.menu{
+    display: flex;
+    list-style: none;
+}
+
+.menu .menu__item{
+    margin-left: 20px;
+}
